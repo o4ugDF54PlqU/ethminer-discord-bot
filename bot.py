@@ -50,12 +50,8 @@ class MyClient(discord.Client):
                 list_gpus.append([
                     gpu_name, gpu_temperature, gpu_load])
 
-            text_list = []
-            for item in list_gpus:
-                text_list.append('\t\t'.join(item))
-
-            text = '\n'.join(text_list)
-            await message.channel.send("```"+text+"```")
+            output = ("```" + "\n\n" + tabulate(list_gpus, tablefmt="plain", headers=["GPU", "Temps","Load"]) + "```")
+            await message.channel.send(output)
 
 client = MyClient()
 client.run('key')
