@@ -3,7 +3,10 @@ import json
 import requests
 import imgkit
 # GPU information
-import GPUtil
+from tabulate import tabulate
+import numpy as np
+import cv2
+import pyautogui
 
 ping_data = {
   "id": 1,
@@ -24,6 +27,14 @@ class MyClient(discord.Client):
         # don't respond to ourselves
         if message.author == self.user:
             return
+
+        if message.content == 'screenshot':
+            image = pyautogui.screenshot()
+            image = cv2.cvtColor(np.array(image),cv2.COLOR_RGB2BGR)
+   
+            # writing it to the disk using opencv
+            cv2.imwrite("screen.png", image)
+            await message.channel.send(file=discord.File('screen.png'))
 
         if message.content == 'ping':
             r = requests.get('http://127.0.0.1:3333', data=payload)
