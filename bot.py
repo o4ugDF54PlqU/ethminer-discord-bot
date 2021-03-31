@@ -3,6 +3,7 @@ import json
 import requests
 import imgkit
 # GPU information
+import GPUtil
 from tabulate import tabulate
 import numpy as np
 import cv2
