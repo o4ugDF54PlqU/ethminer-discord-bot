@@ -11,6 +11,6 @@ for time in r.json()["data"]:
     total_stale += time["staleShares"]
     total_invalid += time["invalidShares"]
 
-print(f"percent valid:{total_valid}/{total_valid+total_invalid+total_stale}, {total_valid/(total_valid+total_invalid+total_stale)}")
-print(f"percent stale:{total_stale}/{total_valid+total_invalid+total_stale}, {total_stale/(total_valid+total_invalid+total_stale)}")
-print(f"percent invalid:{total_invalid}/{total_valid+total_invalid+total_stale}, {total_invalid/(total_valid+total_invalid+total_stale)}")
+print(f"percent valid:{total_valid}/{total_valid+total_invalid+total_stale}, {100*total_valid/(total_valid+total_invalid+total_stale)}")
+print(f"percent stale:{total_stale}/{total_valid+total_invalid+total_stale}, {100*total_stale/(total_valid+total_invalid+total_stale)}")
+print(f"percent invalid:{total_invalid}/{total_valid+total_invalid+total_stale}, {100*total_invalid/(total_valid+total_invalid+total_stale)}")

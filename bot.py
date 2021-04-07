@@ -33,8 +33,8 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
         # don't respond to ourselves
-        if message.author == self.user:
-            return
+        # if message.author == self.user:
+        #     return
 
         if message.content == 'reboot':
             print("REBOOTING")
@@ -103,6 +103,8 @@ async def check_hashrate():
                     print(f"low hash detected: {current_hash}, {low_hash} times")
                     if low_hash >= 3:
                         await channel.send(f"hash too low: {current_hash}")
+                        await channel.send("screenshot")
+                        await channel.send("ping")
                         os.system("shutdown -t 10 -r")
                         return
                 else:
@@ -112,6 +114,8 @@ async def check_hashrate():
 
         if found_worker == False:
             await channel.send("worker not found, rebooting")
+            await channel.send("screenshot")
+            await channel.send("ping")
             os.system("shutdown -t 10 -r")
     
     except requests.ConnectionError:
