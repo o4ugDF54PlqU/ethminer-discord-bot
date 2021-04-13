@@ -21,20 +21,22 @@ ping_data = {
 data_json = json.dumps(ping_data)
 payload = {'json_payload': data_json}
 address = "696b18d7e003be5b4d1a66b981313e1959d69066"
-desired_hash = 195500000
+desired_hash = 191000000
 low_hash = 0
 
 class MyClient(discord.Client):
 
     async def on_ready(self):
+        global low_hash
+        low_hash = 0
         print('Logged on as', self.user)
         channel = client.get_channel(825054534044090408)
         await channel.send('Reboot Detected!')
 
     async def on_message(self, message):
         # don't respond to ourselves
-        # if message.author == self.user:
-        #     return
+        #if message.author == self.user:
+        #    return
 
         if message.content == 'reboot':
             print("REBOOTING")
@@ -63,9 +65,6 @@ class MyClient(discord.Client):
             html_file.close()
             imgkit.from_file('temp.html', 'out.jpg')
             await message.channel.send(file=discord.File('out.jpg'))
-            
-            # Ethminer API doesn't report temperature for me for some reason
-            # this is a backup method (only works for nvidia)
             await message.channel.send("="*40+"GPU Details"+"="*40)
             gpus = GPUtil.getGPUs()
             list_gpus = []
@@ -85,38 +84,26 @@ class MyClient(discord.Client):
             await message.channel.send(output)
             return
 
-@tasks.loop(minutes = 10)
+@tasks.loop(minutes = 2)
 async def check_hashrate():
     global low_hash
     channel = client.get_channel(825054534044090408)
     try:
-        r = requests.get(f'https://api.ethermine.org/miner/:{address}/workers')
-        found_worker = False
-        
-        for worker in r.json()["data"]:
-            
-            if worker["worker"] == "worker001":
+        r = requests.get(f'https://hiveon.net/api/v1/stats/miner/{address}/ETH')
                 
-                if worker["reportedHashrate"] < desired_hash:
-                    low_hash+=1
-                    current_hash = worker["reportedHashrate"]
-                    print(f"low hash detected: {current_hash}, {low_hash} times")
-                    if low_hash >= 3:
-                        await channel.send(f"hash too low: {current_hash}")
-                        await channel.send("screenshot")
-                        await channel.send("ping")
-                        os.system("shutdown -t 10 -r")
-                        return
-                else:
-                    low_hash = 0
-                    
-            found_worker = True
+        if int(r.json()["reportedHashrate"]) < desired_hash:
+            low_hash+=1
+            current_hash = worker["reportedHashrate"]
+            print(f"low hash detected: {current_hash}, {low_hash} times")
+            if low_hash >= 3:
+                await channel.send(f"hash too low: {current_hash}")
+                await channel.send("screenshot")
+                await channel.send("ping")
+                os.system("shutdown -t 10 -r")
+                return
+        else:
+            low_hash = 0
 
-        if found_worker == False:
-            await channel.send("worker not found, rebooting")
-            await channel.send("screenshot")
-            await channel.send("ping")
-            os.system("shutdown -t 10 -r")
     
     except requests.ConnectionError:
         print("error, no internet")
