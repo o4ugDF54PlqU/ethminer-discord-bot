@@ -23,6 +23,7 @@ address = "696b18d7e003be5b4d1a66b981313e1959d69066"
 desired_hash = 195500000
 low_hash = 0
 times_to_check = 3
+worker_name = "worker001"
 
 ping_data = {
   "id": 1,
@@ -107,7 +108,7 @@ async def check_hashrate():
         
         for worker in r.json()["data"]:
             
-            if worker["worker"] == "worker001":
+            if worker["worker"] == worker_name:
                 
                 if worker["reportedHashrate"] < desired_hash:
                     low_hash+=1
