@@ -12,6 +12,18 @@ import cv2
 import pyautogui
 import os
 
+# insert your bot key here, get one from discord
+key = 'key'
+
+# channel to send updates and notifications to
+notification_channel = 825054534044090408
+
+# pool hash check, reboot if hash lower than desired_hash times_to_check times in a row
+address = "696b18d7e003be5b4d1a66b981313e1959d69066"
+desired_hash = 195500000
+low_hash = 0
+times_to_check = 3
+
 ping_data = {
   "id": 1,
   "jsonrpc": "2.0",
@@ -20,9 +32,6 @@ ping_data = {
 
 data_json = json.dumps(ping_data)
 payload = {'json_payload': data_json}
-address = "696b18d7e003be5b4d1a66b981313e1959d69066"
-desired_hash = 195500000
-low_hash = 0
 
 class MyClient(discord.Client):
 
@@ -30,7 +39,7 @@ class MyClient(discord.Client):
         global low_hash
         low_hash = 0
         print('Logged on as', self.user)
-        channel = client.get_channel(825054534044090408)
+        channel = client.get_channel(notification_channel)
         await channel.send('Reboot Detected!')
 
     async def on_message(self, message):
@@ -87,10 +96,11 @@ class MyClient(discord.Client):
             await message.channel.send(output)
             return
 
+# Comment out this part if you don't want to check with pool
 @tasks.loop(minutes = 10)
 async def check_hashrate():
     global low_hash
-    channel = client.get_channel(825054534044090408)
+    channel = client.get_channel(notification_channel)
     try:
         r = requests.get(f'https://api.ethermine.org/miner/:{address}/workers')
         found_worker = False
@@ -103,7 +113,7 @@ async def check_hashrate():
                     low_hash+=1
                     current_hash = worker["reportedHashrate"]
                     print(f"low hash detected: {current_hash}, {low_hash} times")
-                    if low_hash >= 3:
+                    if low_hash >= times_to_check:
                         await channel.send(f"hash too low: {current_hash}")
                         await channel.send("screenshot")
                         await channel.send("ping")
@@ -125,6 +135,7 @@ async def check_hashrate():
 
 check_hashrate.add_exception_type(asyncpg.PostgresConnectionError)
 check_hashrate.start()
+# stop commenting here if you don't want to check with pool
 
 client = MyClient()
-client.run('key')
+client.run(key)
