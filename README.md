@@ -7,5 +7,6 @@ A discord bot that interfaces with the ethminer API. Will require a fair bit of 
 - Remote shutdown with "reboot" and "force reboot"
 - Replies to "screenshot" with a screenshot
 - Checks with pool API every 10 minutes to see hashrate. If hashrate lower than limit 3 times in a row, reboot
-![image](https://user-images.githubusercontent.com/36900762/112730082-1eb9eb80-8f62-11eb-88c8-4621c449bd6e.png)
+
+![image](https://user-images.githubusercontent.com/36900762/115118918-e725e880-9fcf-11eb-87a4-a74c10ae2ff7.png)
 
