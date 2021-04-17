@@ -19,10 +19,12 @@ key = 'key'
 notification_channel = 825054534044090408
 
 # pool hash check, reboot if hash lower than desired_hash times_to_check times in a row
+check_enabled = True
 address = "696b18d7e003be5b4d1a66b981313e1959d69066"
 desired_hash = 191000000
 low_hash = 0
 times_to_check = 3
+worker_name = "WORKER001" # note: case sensitive
 
 ping_data = {
   "id": 1,
@@ -40,7 +42,7 @@ class MyClient(discord.Client):
         low_hash = 0
         print('Logged on as', self.user)
         channel = client.get_channel(notification_channel)
-        await channel.send('Reboot Detected!')
+        await channel.send(f'Worker {worker_name} Reboot Detected!')
 
     async def on_message(self, message):
         # don't respond to ourselves
@@ -93,34 +95,33 @@ class MyClient(discord.Client):
             await message.channel.send(output)
             return
 
-# Comment out this part if you don't want to check with pool
-@tasks.loop(minutes = 5)
-async def check_hashrate():
-    global low_hash
-    channel = client.get_channel(notification_channel)
-    try:
-        r = requests.get(f'https://hiveon.net/api/v1/stats/miner/{address}/ETH')
-                
-        if int(r.json()["reportedHashrate"]) < desired_hash:
-            low_hash+=1
-            current_hash = r.json()["reportedHashrate"]
-            print(f"low hash detected: {current_hash}, {low_hash} times")
-            if low_hash >= times_to_check:
-                await channel.send(f"hash too low: {current_hash}")
-                await channel.send("screenshot")
-                await channel.send("ping")
-                os.system("shutdown -t 10 -r")
-                return
-        else:
-            low_hash = 0
+if check_enabled:
+    @tasks.loop(minutes = 10)
+    async def check_hashrate():
+        global low_hash
+        channel = client.get_channel(notification_channel)
+        try:
+            r = requests.get(f'https://hiveon.net/api/v1/stats/miner/{address}/ETH')
+                    
+            if int(r.json()["reportedHashrate"]) < desired_hash:
+                low_hash+=1
+                current_hash = r.json()["reportedHashrate"]
+                print(f"low hash detected: {current_hash}, {low_hash} times")
+                if low_hash >= times_to_check:
+                    await channel.send(f"{worker_name} hash too low: {current_hash}")
+                    await channel.send("screenshot")
+                    await channel.send("ping")
+                    os.system("shutdown -t 10 -r")
+                    return
+            else:
+                low_hash = 0
 
-    
-    except requests.ConnectionError:
-        print("error, no internet")
+        
+        except requests.ConnectionError:
+            print("error, no internet")
 
-check_hashrate.add_exception_type(asyncpg.PostgresConnectionError)
-check_hashrate.start()
-# stop commenting here if you don't want to check with pool
+    check_hashrate.add_exception_type(asyncpg.PostgresConnectionError)
+    check_hashrate.start()
 
 client = MyClient()
 client.run(key)
