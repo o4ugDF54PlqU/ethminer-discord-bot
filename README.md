@@ -7,7 +7,7 @@ A discord bot that interfaces with the ethminer API and Hiveon/Ethermine to allo
 1. Create a bot and get its key (https://www.writebots.com/discord-bot-token/)
 1. Add the bot to your server, it should now show up as offline
 1. Chose which pool and version you want to run and download it
-    1. multi is if you want to have multiple bots in one channel
+    1. multi is if you want to have multiple bots/rigs controllable in one channel
     1. if you don't want to use either pool, just select one and set check_enabled to False
 1. Open the downloaded bot and change the settings
     - notification_channel is the channel in your server you want to be notified in (you can still send commands from other channels, and it would reply to those commands in those channels). For example, opening a channel on discord web would give you https://discord.com/channels/311480678468550624/825054534044090408 and 825054534044090408 would be the channel number you need.
@@ -25,6 +25,7 @@ A discord bot that interfaces with the ethminer API and Hiveon/Ethermine to allo
 - Remote rebooting with "reboot" and "force reboot"
 - Replies to "screenshot" with a screenshot - useful if you keep temperature data for AMD on the screen for example
 - Checks with pool API every 10 minutes. If hashrate lower than limit times_to_check times in a row, reboot and send screenshot for diagnostic.
+- For the multi versions, simply add the worker name in front of each command (eg "worker001 reboot")
 
 ![image](https://user-images.githubusercontent.com/36900762/115118918-e725e880-9fcf-11eb-87a4-a74c10ae2ff7.png)
 

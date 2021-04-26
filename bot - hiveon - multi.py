@@ -127,7 +127,7 @@ async def check_hashrate():
             print("not in pool during startup")
         else:
             print("not in pool")
-            await channel.send("worker not found on pool, rebooting")
+            await channel.send(f"{worker_name} worker not found on pool, rebooting")
             await channel.send("screenshot")
             await channel.send("ping")
             os.system("shutdown -t 10 -r")

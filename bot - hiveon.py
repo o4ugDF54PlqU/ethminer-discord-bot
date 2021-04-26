@@ -109,7 +109,7 @@ async def check_hashrate():
             current_hash = r.json()["reportedHashrate"]
             print(f"low hash detected: {current_hash}, {low_hash} times")
             if low_hash >= times_to_check:
-                await channel.send(f"{worker_name} hash too low: {current_hash}")
+                await channel.send(f"hash too low: {current_hash}")
                 await channel.send("screenshot")
                 await channel.send("ping")
                 os.system("shutdown -t 10 -r")
