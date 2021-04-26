@@ -1,5 +1,9 @@
 # ethminer-discord-bot
-A discord bot that interfaces with the ethminer API and Hiveon/Ethermine to allow for remote monitoring and control through discord. The bot will be run on the mining rig, if you have multiple each rig will have a single bot. I wrote this on and for Windows and ethminer, so other platforms and miners will require tweaking. Don't forget to put in your bot key from discord.
+A discord bot that interfaces with the ethminer API and Hiveon/Ethermine to allow for remote monitoring and control through discord. The bot will be run on the mining rig - if you have multiple each rig will have a single bot. 
+
+I wrote this on and for Windows and ethminer, so other platforms and miners will require tweaking.
+
+Don't forget to put in your bot key from discord.
 
 # Setup
 1. Install python 3
@@ -10,6 +14,7 @@ A discord bot that interfaces with the ethminer API and Hiveon/Ethermine to allo
     1. multi is if you want to have multiple bots/rigs controllable in one channel
     1. if you don't want to use either pool, just select one and set check_enabled to False
 1. Open the downloaded bot and change the settings
+    - key is your bot key from the previous steps (not your invite link)
     - notification_channel is the channel in your server you want to be notified in (you can still send commands from other channels, and it would reply to those commands in those channels). For example, opening a channel on discord web would give you https://discord.com/channels/311480678468550624/825054534044090408 and 825054534044090408 would be the channel number you need.
     - check_enabled enables periodic pool hashrate checks
     - address is your eth wallet address
