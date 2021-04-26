@@ -21,10 +21,12 @@ notification_channel = 825054534044090408
 check_enabled = True
 address = "696b18d7e003be5b4d1a66b981313e1959d69066"
 desired_hash = 169000000
-low_hash = 0
 times_to_check = 3
-startup = True
 worker_name = "WORKER001" # note: case sensitive
+
+# do not change
+low_hash = 0
+startup = True
 
 ping_data = {
   "id": 1,
@@ -114,6 +116,8 @@ async def check_hashrate():
                 return
         else:
             low_hash = 0
+
+        startup = False
         
     except requests.ConnectionError:
         print("error, no internet")
