@@ -4,7 +4,6 @@ import asyncpg
 import json
 import requests
 import imgkit
-# GPU information
 import GPUtil
 from tabulate import tabulate
 import numpy as np
@@ -21,9 +20,10 @@ notification_channel = 825054534044090408
 # pool hash check, reboot if hash lower than desired_hash times_to_check times in a row
 check_enabled = True
 address = "696b18d7e003be5b4d1a66b981313e1959d69066"
-desired_hash = 195500000
+desired_hash = 169000000
 low_hash = 0
 times_to_check = 3
+startup = True
 worker_name = "worker001" # I don't think it's case sensitive
 
 ping_data = {
@@ -42,7 +42,7 @@ class MyClient(discord.Client):
         low_hash = 0
         print('Logged on as', self.user)
         channel = client.get_channel(notification_channel)
-        await channel.send(f'Worker {worker_name} Reboot Detected!')
+        await channel.send(f'Reboot Detected!')
 
     async def on_message(self, message):
         # don't respond to ourselves
@@ -83,13 +83,9 @@ class MyClient(discord.Client):
             gpus = GPUtil.getGPUs()
             list_gpus = []
             for gpu in gpus:
-                # get the GPU id
                 gpu_id = gpu.id
-                # name of GPU
                 gpu_name = gpu.name
-                # get % percentage of GPU usage of that GPU
                 gpu_load = f"{gpu.load*100}%"
-                # get GPU temperature in Celsius
                 gpu_temperature = f"{gpu.temperature} °C"
                 list_gpus.append([
                     gpu_name, gpu_temperature, gpu_load])
@@ -98,43 +94,47 @@ class MyClient(discord.Client):
             await message.channel.send(output)
             return
 
-if check_enabled:
-    @tasks.loop(minutes = 10)
-    async def check_hashrate():
-        global low_hash
-        channel = client.get_channel(notification_channel)
-        try:
-            r = requests.get(f'https://api.ethermine.org/miner/:{address}/workers')
-            found_worker = False
-            
-            for worker in r.json()["data"]:
-                
-                if worker["worker"] == worker_name:
-                    
-                    if worker["reportedHashrate"] < desired_hash:
-                        low_hash+=1
-                        current_hash = worker["reportedHashrate"]
-                        print(f"low hash detected: {current_hash}, {low_hash} times")
-                        if low_hash >= times_to_check:
-                            await channel.send(f"{worker_name} hash too low: {current_hash}")
-                            await channel.send("screenshot")
-                            await channel.send("ping")
-                            os.system("shutdown -t 10 -r")
-                            return
-                    else:
-                        low_hash = 0
-                        
-                found_worker = True
 
-            if found_worker == False:
-                await channel.send("worker not found, rebooting")
-                await channel.send("screenshot")
-                await channel.send("ping")
-                os.system("shutdown -t 10 -r")
+@tasks.loop(minutes = 10)
+async def check_hashrate():
+    global low_hash, startup
+    channel = client.get_channel(notification_channel)
+    try:
+        r = requests.get(f'https://api.ethermine.org/miner/:{address}/workers')
+        found_worker = False
         
-        except requests.ConnectionError:
-            print("error, no internet")
+        for worker in r.json()["data"]:
+            
+            if worker["worker"] == worker_name:
+                
+                if worker["reportedHashrate"] < desired_hash:
+                    low_hash+=1
+                    current_hash = worker["reportedHashrate"]
+                    print(f"low hash detected: {current_hash}, {low_hash} times")
+                    if low_hash >= times_to_check:
+                        await channel.send(f"{worker_name} hash too low: {current_hash}")
+                        await channel.send("screenshot")
+                        await channel.send("ping")
+                        os.system("shutdown -t 10 -r")
+                        return
+                else:
+                    low_hash = 0
+                    
+            found_worker = True
+            startup = False
 
+        if found_worker == False and startup == False:
+            await channel.send("worker not found on pool, rebooting")
+            await channel.send("screenshot")
+            await channel.send("ping")
+            os.system("shutdown -t 10 -r")
+        elif startup == True:
+            startup = False
+    
+    except requests.ConnectionError:
+        print("error, no internet")
+
+if check_enabled:
     check_hashrate.add_exception_type(asyncpg.PostgresConnectionError)
     check_hashrate.start()
 

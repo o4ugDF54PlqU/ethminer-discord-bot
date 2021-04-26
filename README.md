@@ -1,5 +1,10 @@
 # ethminer-discord-bot
-A discord bot that interfaces with the ethminer API. Will require a fair bit of setup. Don't forget to put in your bot key.
+A discord bot that interfaces with the ethminer API and Hiveon/Ethermine to allow for remote monitoring and control through discord. Will require a fair bit of setup. Don't forget to put in your bot key.
+
+# Setup
+
+To get the "ping" command to work correctly, you'll need to install wkhtmltopdf for imgkit. Instructuctions:
+https://pypi.org/project/imgkit/
 
 # Features:
 - Sends a message to a predetermined channel on reboot (useful to know when a power outage happens and you need to reapply overclocks)

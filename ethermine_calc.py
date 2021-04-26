@@ -7,9 +7,13 @@ total_valid = 0
 total_stale = 0
 total_invalid = 0
 for time in r.json()["data"]:
-    total_valid += time["validShares"]
-    total_stale += time["staleShares"]
-    total_invalid += time["invalidShares"]
+    try:
+        total_valid += time["validShares"]
+        total_stale += time["staleShares"]
+        total_invalid += time["invalidShares"]
+    except TypeError:
+        # in case of no data
+        total_valid+=0
 
 print(f"percent valid:{total_valid}/{total_valid+total_invalid+total_stale}, {100*total_valid/(total_valid+total_invalid+total_stale)}")
 print(f"percent stale:{total_stale}/{total_valid+total_invalid+total_stale}, {100*total_stale/(total_valid+total_invalid+total_stale)}")

@@ -24,7 +24,7 @@ desired_hash = 169000000
 low_hash = 0
 times_to_check = 3
 startup = True
-worker_name = "WORKER001" # note: case sensitive
+worker_name = "worker001" # I don't think it's case sensitive
 
 ping_data = {
   "id": 1,
@@ -46,20 +46,20 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
         # don't respond to ourselves
-        #if message.author == self.user:
-        #    return
+        # if message.author == self.user:
+        #     return
 
-        if message.content == 'reboot':
+        if message.content == f'{worker_name} reboot':
             print("REBOOTING")
             os.system("shutdown -t 0 -r")
             return
 
-        if message.content == 'force reboot':
+        if message.content == f'{worker_name} force reboot':
             print("REBOOTING")
             os.system("shutdown -t 0 -r -f")
             return
 
-        if message.content == 'screenshot':
+        if message.content == f'{worker_name} screenshot':
             image = pyautogui.screenshot()
             image = cv2.cvtColor(np.array(image),cv2.COLOR_RGB2BGR)
    
@@ -69,7 +69,7 @@ class MyClient(discord.Client):
             return
             
 
-        if message.content == 'ping':
+        if message.content == f'{worker_name} ping':
             r = requests.get('http://127.0.0.1:3333', data=payload)
             html_file = open("temp.html", "w")
             html_file.write(r.text)
@@ -94,39 +94,45 @@ class MyClient(discord.Client):
             await message.channel.send(output)
             return
 
+
 @tasks.loop(minutes = 10)
 async def check_hashrate():
     global low_hash, startup
     channel = client.get_channel(notification_channel)
     try:
-        r = requests.get(f'https://hiveon.net/api/v1/stats/miner/{address}/ETH/workers')
-        worker_data = r.json()["workers"][worker_name]
+        r = requests.get(f'https://api.ethermine.org/miner/:{address}/workers')
+        found_worker = False
         
-        if int(r.json()["reportedHashrate"]) < desired_hash:
-            low_hash+=1
-            current_hash = r.json()["reportedHashrate"]
-            print(f"low hash detected: {current_hash}, {low_hash} times")
-            if low_hash >= times_to_check:
-                await channel.send(f"{worker_name} hash too low: {current_hash}")
-                await channel.send("screenshot")
-                await channel.send("ping")
-                os.system("shutdown -t 10 -r")
-                return
-        else:
-            low_hash = 0
-        
-    except requests.ConnectionError:
-        print("error, no internet")
-    except KeyError:
-        if startup:
+        for worker in r.json()["data"]:
+            
+            if worker["worker"] == worker_name:
+                
+                if worker["reportedHashrate"] < desired_hash:
+                    low_hash+=1
+                    current_hash = worker["reportedHashrate"]
+                    print(f"low hash detected: {current_hash}, {low_hash} times")
+                    if low_hash >= times_to_check:
+                        await channel.send(f"{worker_name} hash too low: {current_hash}")
+                        await channel.send("screenshot")
+                        await channel.send("ping")
+                        os.system("shutdown -t 10 -r")
+                        return
+                else:
+                    low_hash = 0
+                    
+            found_worker = True
             startup = False
-            print("not in pool during startup")
-        else:
-            print("not in pool")
+
+        if found_worker == False and startup == False:
             await channel.send("worker not found on pool, rebooting")
             await channel.send("screenshot")
             await channel.send("ping")
             os.system("shutdown -t 10 -r")
+        elif startup == True:
+            startup = False
+    
+    except requests.ConnectionError:
+        print("error, no internet")
 
 if check_enabled:
     check_hashrate.add_exception_type(asyncpg.PostgresConnectionError)

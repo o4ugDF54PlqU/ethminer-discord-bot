@@ -49,17 +49,17 @@ class MyClient(discord.Client):
         #if message.author == self.user:
         #    return
 
-        if message.content == 'reboot':
+        if message.content == f'{worker_name} reboot':
             print("REBOOTING")
             os.system("shutdown -t 0 -r")
             return
 
-        if message.content == 'force reboot':
+        if message.content == f'{worker_name} force reboot':
             print("REBOOTING")
             os.system("shutdown -t 0 -r -f")
             return
 
-        if message.content == 'screenshot':
+        if message.content == f'{worker_name} screenshot':
             image = pyautogui.screenshot()
             image = cv2.cvtColor(np.array(image),cv2.COLOR_RGB2BGR)
    
@@ -69,7 +69,7 @@ class MyClient(discord.Client):
             return
             
 
-        if message.content == 'ping':
+        if message.content == f'{worker_name} ping':
             r = requests.get('http://127.0.0.1:3333', data=payload)
             html_file = open("temp.html", "w")
             html_file.write(r.text)
@@ -102,7 +102,7 @@ async def check_hashrate():
         r = requests.get(f'https://hiveon.net/api/v1/stats/miner/{address}/ETH/workers')
         worker_data = r.json()["workers"][worker_name]
         
-        if int(r.json()["reportedHashrate"]) < desired_hash:
+        if int(worker_data["reportedHashrate"]) < desired_hash:
             low_hash+=1
             current_hash = r.json()["reportedHashrate"]
             print(f"low hash detected: {current_hash}, {low_hash} times")
