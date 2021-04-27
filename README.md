@@ -32,6 +32,7 @@ Don't forget to put in your bot key from discord.
 - Replies to "screenshot" with a screenshot - useful if you keep temperature data for AMD on the screen for example
 - Checks with pool API every 10 minutes. If hashrate lower than limit times_to_check times in a row, reboot and send screenshot for diagnostic.
 - For the multi versions, simply add the worker name in front of each command (eg "worker001 reboot")
+- Bonus: ethermine calculator, calculates 24h shares because the default 1h is dumb
 
 ![image](https://user-images.githubusercontent.com/36900762/115118918-e725e880-9fcf-11eb-87a4-a74c10ae2ff7.png)
 
