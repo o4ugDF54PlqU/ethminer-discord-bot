@@ -114,6 +114,8 @@ async def check_hashrate():
                 await channel.send("ping")
                 os.system("shutdown -t 10 -r")
                 return
+            else:
+                await channel.send(f"{worker_name} low hash warning: {current_hash}")
         else:
             low_hash = 0
 
