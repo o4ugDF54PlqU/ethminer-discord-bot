@@ -102,6 +102,7 @@ async def check_hashrate():
     global low_hash, startup
     channel = client.get_channel(notification_channel)
     try:
+        await channel.send("ping")
         r = requests.get(f'https://api.ethermine.org/miner/:{address}/workers')
         found_worker = False
         
@@ -114,9 +115,8 @@ async def check_hashrate():
                     current_hash = worker["reportedHashrate"]
                     print(f"low hash detected: {current_hash}, {low_hash} times")
                     if low_hash >= times_to_check:
-                        await channel.send(f"hash too low: {current_hash}")
+                        await channel.send(f"@everyone hash too low: {current_hash}, rebooting")
                         await channel.send("screenshot")
-                        await channel.send("ping")
                         os.system("shutdown -t 10 -r")
                         return
                     else:
@@ -130,13 +130,14 @@ async def check_hashrate():
         if found_worker == False and startup == False:
             await channel.send("worker not found on pool, rebooting")
             await channel.send("screenshot")
-            await channel.send("ping")
             os.system("shutdown -t 10 -r")
         elif startup == True:
             startup = False
     
     except requests.ConnectionError:
         print("error, no internet")
+    except AttributeError:
+        print("not logged on yet")
 
 if check_enabled:
     check_hashrate.add_exception_type(asyncpg.PostgresConnectionError)
