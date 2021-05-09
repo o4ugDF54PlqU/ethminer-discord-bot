@@ -30,7 +30,8 @@ Don't forget to put in your bot key from discord.
 - Replies to "ping" with data
 - Remote rebooting with "reboot" and "force reboot"
 - Replies to "screenshot" with a screenshot - useful if you keep temperature data for AMD on the screen for example
-- Checks with pool API every 10 minutes. If hashrate lower than limit times_to_check times in a row, reboot and send screenshot for diagnostic.
+- Checks with pool API every 10 minutes. If hashrate lower than limit times_to_check times in a row, @everyone, reboot and send screenshot for diagnostic.
+    - Also does a ping every check. Simply delete if you don't want periodic data.
 - For the multi versions, simply add the worker name in front of each command (eg "worker001 reboot")
 - Bonus: ethermine calculator, calculates 24h shares because the default 1h is dumb
 
