@@ -29,6 +29,7 @@ Don't forget to put in your bot key from discord.
 # Features:
 - Sends a message to a predetermined channel on reboot (useful to know when a power outage happens or keep track of instability)
 - Replies to "ping" with data
+- Pings itself every 10 minutes by default (I recommend disabling notification on that channel, or turning this off in the script)
 - Remote rebooting with "reboot" and "force reboot"
 - Replies to "screenshot" with a screenshot - useful if you keep temperature data for AMD on the screen for example
 - Checks with pool API every 10 minutes. If hashrate lower than limit times_to_check times in a row, @everyone, reboot and send screenshot for diagnostic.
