@@ -23,7 +23,8 @@ Don't forget to put in your bot key from discord.
     - worker_name is the name of your worker, same as the one set in ethminer
 1. To get the "ping" command to work correctly, you'll need to install wkhtmltopdf for imgkit. Instructuctions: https://pypi.org/project/imgkit/
 1. Add the bot to the startup folder/task scheduler
-1. If you want to hide the bot window, simply rename the script extension from .py to .pyw
+    - If you want to hide the bot window, simply rename the script extension from .py to .pyw
+1. **Make sure to put --api-bind 127.0.0.1:3333 in your ethminer script**
 
 # Features:
 - Sends a message to a predetermined channel on reboot (useful to know when a power outage happens or keep track of instability)
