@@ -124,8 +124,9 @@ async def check_hashrate():
                 else:
                     low_hash = 0
                     
-            found_worker = True
-            startup = False
+                found_worker = True
+                startup = False
+                break
 
         if found_worker == False and startup == False:
             await channel.send("worker not found on pool, rebooting")
