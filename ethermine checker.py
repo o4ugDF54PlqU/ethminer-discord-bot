@@ -41,6 +41,7 @@ while times_to_check > 0:
 
     except requests.ConnectionError:
         print("error, no internet")
+        times_to_check -= 1
         desired_log.append(False)
     except AttributeError:
         print("not logged on yet")

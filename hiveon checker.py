@@ -29,6 +29,7 @@ while times_to_check > 0:
 
     except requests.ConnectionError:
         print("error, no internet")
+        times_to_check -= 1
         desired_log.append(False)
     except KeyError:
         print("not in pool")
